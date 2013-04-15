@@ -11,7 +11,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 public class DiceDistributionActivity extends Activity {
-    public static final int ROUNDS = 100;
+    public static final int ROUNDS = 1000;
     public static final int ROUND_DELAY = 50; // milliseconds
 	
     private TextView roundView;
@@ -25,6 +25,7 @@ public class DiceDistributionActivity extends Activity {
         createUI();
         castDice();
 	}
+	
     
     private void createUI() {
        	TableLayout tableLayout = new TableLayout(this);
@@ -54,25 +55,39 @@ public class DiceDistributionActivity extends Activity {
     
     private void castDice() {
     	counts = new int[11];
-		Random random = new Random();
-		try {
-			for (int i = 0; i < ROUNDS; i++) {
-				int die1 = random.nextInt(6);
-				int die2 = random.nextInt(6);
-				int sum = die1 + die2;
-				counts[sum]++;
-				if (counts[sum] > maximumCount)
-					maximumCount = counts[sum];
+		final Random random = new Random();
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					for (int i = 0; i < ROUNDS; i++) {
+						int die1 = random.nextInt(6);
+						int die2 = random.nextInt(6);
+						int sum = die1 + die2;
+						counts[sum]++;
+						
+						if (counts[sum] > maximumCount)
+							maximumCount = counts[sum];
 
-				for (int k = 0; k < 11; k++) {
-					bars[k].setMax(maximumCount);
-					bars[k].setProgress(counts[k]);
+						for (int k = 0; k < 11; k++) {
+							bars[k].setMax(maximumCount);
+							bars[k].setProgress(counts[k]);
+						}	
+						
+						final int throwsNumber = i;
+						//roundView.setText(Integer.toString(i + 1));
+						
+						roundView.post(new Runnable() {
+							public void run() {
+								roundView.setText(Integer.toString(throwsNumber + 1));
+							}
+						});
+						Thread.sleep(ROUND_DELAY);
+					}
+				} catch (InterruptedException e) {
+						
 				}
-				roundView.setText(Integer.toString(i + 1));
-
-				Thread.sleep(ROUND_DELAY);
-    		}
-		} catch (InterruptedException e) {
-		}
+			}
+		}).start();
+		
     }
 }
