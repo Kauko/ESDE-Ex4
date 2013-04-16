@@ -87,42 +87,4 @@ public class DiceDistributionActivity extends Activity {
 		
     	setContentView(tableLayout, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
-    
-    private void castDice() {
-    	counts = new int[11];
-		final Random random = new Random();
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					for (int i = 0; i < ROUNDS; i++) {
-						int die1 = random.nextInt(6);
-						int die2 = random.nextInt(6);
-						int sum = die1 + die2;
-						counts[sum]++;
-						
-						if (counts[sum] > maximumCount)
-							maximumCount = counts[sum];
-
-						for (int k = 0; k < 11; k++) {
-							bars[k].setMax(maximumCount);
-							bars[k].setProgress(counts[k]);
-						}	
-						
-						final int throwsNumber = i;
-						//roundView.setText(Integer.toString(i + 1));
-						
-						roundView.post(new Runnable() {
-							public void run() {
-								roundView.setText(Integer.toString(throwsNumber + 1));
-							}
-						});
-						Thread.sleep(ROUND_DELAY);
-					}
-				} catch (InterruptedException e) {
-						
-				}
-			}
-		}).start();
-		
-    }
 }
